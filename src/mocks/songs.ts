@@ -1,0 +1,81 @@
+import type { Song, SongPreview } from "@/types";
+
+/**
+ * Mock song data for UI development.
+ * Replace with real API calls once backend is ready.
+ */
+export const MOCK_SONGS: Song[] = [
+  {
+    id: "1",
+    title: "Cánh Hồng Phai",
+    artist: "Đàm Vĩnh Hưng",
+    genre: "bolero",
+    originalTone: "D",
+    notation: "Re Mi Fa Sol La Si\nDo Re Mi Fa Sol",
+    lyrics: "Cánh hồng phai theo gió ngàn...",
+    visibility: "public",
+    authorName: "Admin",
+    likes: 128,
+    views: 1420,
+    createdAt: "2024-01-15T07:00:00Z",
+    updatedAt: "2024-01-15T07:00:00Z",
+    tags: ["bolero", "tình ca"],
+  },
+  {
+    id: "2",
+    title: "Dạ Cổ Hoài Lang",
+    artist: "Cao Văn Lầu",
+    genre: "cai-luong",
+    originalTone: "C",
+    notation: "Do Re Mi Fa Sol La Si Do\nDo Si La Sol Fa Mi Re Do",
+    visibility: "public",
+    authorName: "Admin",
+    likes: 256,
+    views: 3100,
+    createdAt: "2024-02-01T07:00:00Z",
+    updatedAt: "2024-02-01T07:00:00Z",
+    tags: ["cải lương", "cổ điển"],
+  },
+  {
+    id: "3",
+    title: "Trống Cơm",
+    artist: "Dân Ca",
+    genre: "dan-ca",
+    originalTone: "G",
+    notation: "Sol La Si Do Re\nMi Fa Sol La Si",
+    visibility: "public",
+    authorName: "Admin",
+    likes: 87,
+    views: 980,
+    createdAt: "2024-03-10T07:00:00Z",
+    updatedAt: "2024-03-10T07:00:00Z",
+    tags: ["dân ca", "Bắc Bộ"],
+  },
+  {
+    id: "4",
+    title: "Lý Cây Bông",
+    artist: "Dân Ca Nam Bộ",
+    genre: "dan-ca",
+    originalTone: "F",
+    notation: "Fa Sol La Sib Do\nDo Sib La Sol Fa",
+    visibility: "public",
+    authorName: "Admin",
+    likes: 64,
+    views: 720,
+    createdAt: "2024-03-20T07:00:00Z",
+    updatedAt: "2024-03-20T07:00:00Z",
+    tags: ["dân ca", "Nam Bộ"],
+  },
+];
+
+export const MOCK_SONG_PREVIEWS: SongPreview[] = MOCK_SONGS.map((s) => ({
+  id: s.id,
+  title: s.title,
+  artist: s.artist,
+  genre: s.genre,
+  originalTone: s.originalTone,
+  likes: s.likes,
+  views: s.views,
+  createdAt: s.createdAt,
+  preview: s.notation.slice(0, 80),
+}));

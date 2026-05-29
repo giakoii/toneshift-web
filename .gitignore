@@ -1,0 +1,123 @@
+# ─────────────────────────────────────────────────────────────
+#  ToneShift – .gitignore
+#  Tham khảo: https://gitignore.io / github/gitignore
+# ─────────────────────────────────────────────────────────────
+
+# ── Dependencies ──────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ── Next.js build outputs ─────────────────────────────────────
+.next/
+out/
+build/
+dist/
+
+# ── TypeScript ────────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Environment variables (QUAN TRỌNG – không bao giờ push) ──
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+.env.*.local
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ── Testing / Coverage ────────────────────────────────────────
+coverage/
+.nyc_output/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
+# ── Cache ─────────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+.stylelintcache
+*.swp
+*.swo
+
+# ── macOS ─────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# ── Windows ───────────────────────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── IDE – JetBrains (WebStorm, IntelliJ) ─────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+.idea_modules/
+
+# ── IDE – VS Code ─────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# ── IDE – Vim / Emacs ─────────────────────────────────────────
+*~
+*.swp
+*.swo
+.#*
+\#*#
+
+# ── Vercel ────────────────────────────────────────────────────
+.vercel/
+
+# ── Netlify ───────────────────────────────────────────────────
+.netlify/
+
+# ── Certificates / Keys (KHÔNG BAO GIỜ PUSH) ─────────────────
+*.pem
+*.p12
+*.key
+*.crt
+*.cert
+*.pfx
+
+# ── Docker ────────────────────────────────────────────────────
+.docker/
+docker-compose.override.yml
+
+# ── Misc ──────────────────────────────────────────────────────
+*.tgz
+*.zip
+*.tar.gz
+.temp/
+tmp/
+temp/

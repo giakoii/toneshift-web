@@ -11,20 +11,6 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "ToneShift – Chuyển Tone Cảm Âm Việt Nam",
-  description:
-    "Công cụ chuyển đổi cảm âm nhạc Việt Nam hàng đầu. Transpose cảm âm sáo trúc, harmonica, guitar giữa các tone một cách tự động, nhanh chóng và chính xác.",
-  keywords: [
-    "đổi tone cảm âm",
-    "chuyển tone nhạc",
-    "cảm âm sáo trúc",
-    "transpose Vietnamese music",
-    "cảm âm cải lương",
-    "đổi tone guitar",
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {

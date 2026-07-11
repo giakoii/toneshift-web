@@ -33,7 +33,7 @@ export default function RootLayout({
     >
       <body className="bg-background text-foreground overflow-x-hidden">
         <Header />
-        <main>{children}</main>
+        <main className="pt-20 min-h-[calc(100dvh-72px)]">{children}</main>
         <Footer />
       </body>
     </html>

@@ -5,8 +5,7 @@ import Link from "next/link";
 import { useScrolled } from "@/hooks/useScrolled";
 import { NAV_LINKS } from "@/constants/navigation";
 import { Menu, X } from "lucide-react";
-import logo from "@/assets/logo.png";
-import Image from "next/image";
+import Logo from "@/components/ui/Logo";
 
 export default function Header() {
   const scrolled = useScrolled(30);
@@ -40,16 +39,7 @@ export default function Header() {
         `}
       >
         {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-2.5 group select-none"
-          aria-label="ToneShift – về trang chủ"
-        >
-          <Image src={logo} alt="ToneShift Logo" width={32} height={32} className="rounded-full" />
-          <span className="font-semibold text-[15px] tracking-tight text-white">
-            Tone<span className="text-blue-400">Shift</span>
-          </span>
-        </Link>
+        <Logo />
 
         {/* Desktop nav links */}
         <ul className="hidden md:flex items-center gap-1" role="list">

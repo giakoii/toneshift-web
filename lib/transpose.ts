@@ -1,47 +1,90 @@
-import { CHROMATIC_SCALE, FLAT_ALIASES } from "@/constants/musical-keys";
+import {
+  CHROMATIC_SCALE,
+  FLAT_ALIASES,
+  VIET_TO_WESTERN,
+  WESTERN_TO_VIET,
+} from "@/constants/musical-keys";
 
 export interface Token {
   type: "note" | "text" | "separator";
   value: string;
 }
 
-// Regex: root note + optional suffix (quality, extensions, slash bass)
-const NOTE_REGEX = /\b([A-G][#b]?)(m|maj|min|dim|aug|sus|add|[0-9])*(\/[A-G][#b]?)?\b/g;
+// Vietnamese roots must come before [A-G] so "Fa" matches as Vietnamese, not just "F"
+const VIET_ROOTS = "Sol|Đô|Rê|Mi|Fa|La|Si";
+const ROOT = `(?:${VIET_ROOTS}|[A-G])`;
+const QUALITY = "(?:m(?:aj|in)?|dim|aug|sus[24]?|add|[0-9]+)*";
+const SLASH = `(?:\\/${ROOT}[#b]?)?`;
 
-/**
- * Normalize a root note to its sharp equivalent.
- * e.g. "Db" → "C#", "C" → "C"
- */
-function normalizeNote(note: string): string {
-  return FLAT_ALIASES[note] ?? note;
-}
+// Unicode-aware boundaries prevent matching letters inside Vietnamese words
+// e.g. "Có" won't match "C" because "ó" is \p{L}
+const CHORD_PATTERN = `(?<!\\p{L})${ROOT}[#b]?${QUALITY}${SLASH}(?!\\p{L})`;
 
-/**
- * Transpose a single root note by a number of semitones.
- */
-function transposeRoot(root: string, semitones: number): string {
-  const normalized = normalizeNote(root);
-  const index = CHROMATIC_SCALE.indexOf(normalized);
-  if (index === -1) return root;
-  return CHROMATIC_SCALE[(index + semitones + 12) % 12];
+function createNoteRegex(): RegExp {
+  return new RegExp(CHORD_PATTERN, "gu");
 }
 
 /**
  * Calculate semitone distance between two keys.
  */
 function getSemitones(fromKey: string, toKey: string): number {
-  const from = CHROMATIC_SCALE.indexOf(normalizeNote(fromKey));
-  const to = CHROMATIC_SCALE.indexOf(normalizeNote(toKey));
+  const fromNorm = FLAT_ALIASES[fromKey] ?? fromKey;
+  const toNorm = FLAT_ALIASES[toKey] ?? toKey;
+  const from = CHROMATIC_SCALE.indexOf(fromNorm);
+  const to = CHROMATIC_SCALE.indexOf(toNorm);
   if (from === -1 || to === -1) return 0;
   return (to - from + 12) % 12;
 }
 
 /**
- * Transpose a full chord string (e.g. "Am7/G" → "Em7/D").
+ * Transpose a single root+accidental pair.
+ * Preserves Vietnamese notation when the original root was Vietnamese.
+ */
+function transposeRootWithAccidental(
+  root: string,
+  accidental: string,
+  semitones: number,
+): string {
+  const isViet = root in VIET_TO_WESTERN;
+  const westernRoot = isViet ? VIET_TO_WESTERN[root] : root;
+
+  // Normalize flats to sharps
+  const combined = westernRoot + accidental;
+  const normalized = FLAT_ALIASES[combined] ?? combined;
+
+  const index = CHROMATIC_SCALE.indexOf(normalized);
+  if (index === -1) return root + accidental;
+
+  const newNote = CHROMATIC_SCALE[(index + semitones + 12) % 12];
+
+  if (isViet) {
+    const newWesternRoot = newNote[0];
+    const newAcc = newNote.length > 1 ? newNote.slice(1) : "";
+    return (WESTERN_TO_VIET[newWesternRoot] ?? newWesternRoot) + newAcc;
+  }
+
+  return newNote;
+}
+
+/**
+ * Transpose all root notes within a chord string.
+ * e.g. "Am7/G" → "Em7/D", "Fam7/Đô" → "Đôm7/Sol"
  */
 function transposeChord(chord: string, semitones: number): string {
-  // Handle slash chords: transpose both the main root and the bass note
-  return chord.replace(/[A-G][#b]?/g, (match) => transposeRoot(match, semitones));
+  const rootInChord = new RegExp(`(${VIET_ROOTS}|[A-G])([#b]?)`, "gu");
+  return chord.replace(rootInChord, (_match, root: string, accidental: string) =>
+    transposeRootWithAccidental(root, accidental, semitones),
+  );
+}
+
+/**
+ * Transpose all chords in a text from one key to another.
+ */
+export function transposeText(text: string, fromKey: string, toKey: string): string {
+  if (fromKey === toKey) return text;
+  const semitones = getSemitones(fromKey, toKey);
+  const regex = createNoteRegex();
+  return text.replace(regex, (match) => transposeChord(match, semitones));
 }
 
 /**
@@ -50,23 +93,17 @@ function transposeChord(chord: string, semitones: number): string {
 export function parseTokens(text: string): Token[] {
   const tokens: Token[] = [];
   let lastIndex = 0;
-
-  // Reset regex state
-  NOTE_REGEX.lastIndex = 0;
+  const regex = createNoteRegex();
   let match: RegExpExecArray | null;
 
-  while ((match = NOTE_REGEX.exec(text)) !== null) {
-    // Text before this match
+  while ((match = regex.exec(text)) !== null) {
     if (match.index > lastIndex) {
-      const between = text.slice(lastIndex, match.index);
-      pushTextTokens(tokens, between);
+      pushTextTokens(tokens, text.slice(lastIndex, match.index));
     }
-
     tokens.push({ type: "note", value: match[0] });
-    lastIndex = NOTE_REGEX.lastIndex;
+    lastIndex = regex.lastIndex;
   }
 
-  // Remaining text after last match
   if (lastIndex < text.length) {
     pushTextTokens(tokens, text.slice(lastIndex));
   }
@@ -78,7 +115,6 @@ export function parseTokens(text: string): Token[] {
  * Split a raw text segment into text and separator tokens.
  */
 function pushTextTokens(tokens: Token[], segment: string) {
-  // Split on separators (/, -, |) while keeping them
   const parts = segment.split(/([/\-|])/);
   for (const part of parts) {
     if (!part) continue;
@@ -91,19 +127,7 @@ function pushTextTokens(tokens: Token[], segment: string) {
 }
 
 /**
- * Transpose all chords in a text from one key to another.
- */
-export function transposeText(text: string, fromKey: string, toKey: string): string {
-  if (fromKey === toKey) return text;
-
-  const semitones = getSemitones(fromKey, toKey);
-  NOTE_REGEX.lastIndex = 0;
-
-  return text.replace(NOTE_REGEX, (match) => transposeChord(match, semitones));
-}
-
-/**
- * Parse tokens from already-transposed text (for highlighted output).
+ * Transpose and parse in one step (convenience for highlighted output).
  */
 export function transposeAndParse(text: string, fromKey: string, toKey: string): Token[] {
   const transposed = transposeText(text, fromKey, toKey);

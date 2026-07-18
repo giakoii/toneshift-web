@@ -33,8 +33,8 @@ export default function Header() {
           border border-white/[0.08]
           transition-all duration-500 ease-out
           ${scrolled
-            ? "bg-[oklch(0.10_0_0/0.85)] backdrop-blur-xl shadow-[0_8px_40px_oklch(0_0_0/0.5)]"
-            : "bg-[oklch(0.10_0_0/0.4)] backdrop-blur-md shadow-[0_2px_20px_oklch(0_0_0/0.2)]"
+            ? "bg-[oklch(0.15_0.015_45/0.85)] backdrop-blur-xl shadow-[0_8px_40px_oklch(0_0_0/0.5)]"
+            : "bg-[oklch(0.15_0.015_45/0.4)] backdrop-blur-md shadow-[0_2px_20px_oklch(0_0_0/0.2)]"
           }
         `}
       >
@@ -65,11 +65,11 @@ export default function Header() {
         <div className="flex items-center gap-2">
           {/* Desktop CTA */}
           <Button
-            href="#get-started"
+            href="/converter"
             id="header-cta"
-            className="hidden md:inline-flex shadow-[0_0_20px_oklch(0.49_0.24_264/0.35)] hover:shadow-[0_0_28px_oklch(0.49_0.24_264/0.6)] hover:brightness-110"
+            className="hidden md:inline-flex shadow-[0_0_20px_oklch(0.65_0.18_55/0.35)] hover:shadow-[0_0_28px_oklch(0.65_0.18_55/0.6)] hover:brightness-110"
           >
-            Bắt đầu miễn phí
+            Dùng thử ngay
           </Button>
 
           {/* Mobile hamburger */}
@@ -99,7 +99,7 @@ export default function Header() {
           absolute top-[72px] left-4 right-4
           rounded-2xl
           border border-white/[0.08]
-          bg-[oklch(0.10_0_0/0.92)] backdrop-blur-xl
+          bg-[oklch(0.15_0.015_45/0.92)] backdrop-blur-xl
           shadow-[0_16px_48px_oklch(0_0_0/0.6)]
           overflow-hidden
           transition-all duration-300 ease-out
@@ -127,12 +127,12 @@ export default function Header() {
 
         <div className="px-2 pb-2">
           <Button
-            href="#get-started"
+            href="/converter"
             onClick={() => setMobileOpen(false)}
             id="mobile-cta"
             className="w-full flex"
           >
-            Bắt đầu miễn phí
+            Dùng thử ngay
           </Button>
         </div>
       </div>

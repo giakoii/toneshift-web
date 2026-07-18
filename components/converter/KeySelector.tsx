@@ -35,12 +35,12 @@ export default function KeySelector({ variant }: KeySelectorProps) {
             bg-white/[0.07] border border-white/[0.1]
             text-white
             hover:bg-white/[0.12]
-            focus:outline-none focus:ring-2 focus:ring-blue-500/40
+            focus:outline-none focus:ring-2 focus:ring-amber-500/40
             transition-all duration-200
           `}
         >
           {CHROMATIC_SCALE.map((key, i) => (
-            <option key={key} value={key} className="bg-[oklch(0.12_0.003_264)] text-white">
+            <option key={key} value={key} className="bg-[oklch(0.17_0.015_45)] text-white">
               {KEY_DISPLAY_NAMES[i]}
             </option>
           ))}

@@ -44,7 +44,7 @@ export default function SyntaxHighlighter({ text, className = "" }: SyntaxHighli
 function getTokenClass(token: Token): string {
   switch (token.type) {
     case "note":
-      return "text-blue-400 font-bold";
+      return "text-amber-400 font-bold";
     case "separator":
       return "text-white/30";
     case "text":

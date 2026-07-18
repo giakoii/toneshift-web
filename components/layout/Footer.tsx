@@ -21,11 +21,11 @@ const FOOTER_LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="relative w-full border-t border-white/5 bg-[oklch(0.09_0.002_264)]">
+    <footer className="relative w-full border-t border-white/5 bg-[oklch(0.14_0.015_45)]">
       {/* Ambient glow top */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-blue-500/30 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-500/30 to-transparent"
       />
 
       <div className="mx-auto w-full max-w-6xl px-6 py-16">

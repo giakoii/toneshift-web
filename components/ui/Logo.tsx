@@ -28,7 +28,7 @@ export default function Logo({
       />
       {showName && (
         <span className="font-semibold text-[15px] tracking-tight text-white">
-          Tone <span className="text-blue-400">Shift</span>
+          Tone <span className="text-amber-400">Shift</span>
         </span>
       )}
     </span>

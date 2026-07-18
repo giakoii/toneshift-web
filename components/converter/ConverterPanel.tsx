@@ -103,12 +103,12 @@ export default function ConverterPanel() {
             flex flex-col
             rounded-2xl
             border border-white/[0.08]
-            bg-blue-500/[0.03]
+            bg-amber-500/[0.03]
             overflow-hidden
           "
         >
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
-            <span className="text-xs font-medium text-blue-400/60 uppercase tracking-wider">
+            <span className="text-xs font-medium text-amber-400/60 uppercase tracking-wider">
               Kết quả
             </span>
             {outputText && (

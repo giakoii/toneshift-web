@@ -1,11 +1,21 @@
-import React from 'react';
+"use client";
 
-const Home = () => {
-    return (
-        <div>
+import HeroSection from "@/components/sections/HeroSection";
+import ConverterShowcase from "@/components/sections/ConverterShowcase";
+import KeyFeatures from "@/components/sections/KeyFeatures";
+import CommunityShowcase from "@/components/sections/CommunityShowcase";
+import { AuroraBackground } from "@/components/effects/AuroraBackground";
+import { MouseSpotlight } from "@/components/effects/MouseSpotlight";
 
-        </div>
-    );
-};
-
-export default Home;
+export default function Home() {
+  return (
+    <>
+      <AuroraBackground />
+      <MouseSpotlight />
+      <HeroSection />
+      <ConverterShowcase />
+      <KeyFeatures />
+      <CommunityShowcase />
+    </>
+  );
+}

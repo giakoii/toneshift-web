@@ -46,7 +46,7 @@ export default function ConverterPanel() {
             w-8 h-8 rounded-lg
             bg-white/[0.05] border border-white/[0.08]
             text-white/40 hover:text-white hover:bg-white/[0.1]
-            transition-all duration-200
+            transition-colors duration-200
             active:scale-90
           "
         >

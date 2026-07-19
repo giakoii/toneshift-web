@@ -35,11 +35,11 @@ export default function HeroSection() {
             transition={{
               duration: 0.6,
               delay: reduce ? 0 : 0.4, // delayed after the first part
-              type: "spring",
+              type: "spring" as const,
               damping: 12,
               stiffness: 100,
             }}
-            className="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent mx-2"
+            className="text-amber-400 mx-2"
           >
             nhanh chóng
           </motion.span>
@@ -68,7 +68,7 @@ export default function HeroSection() {
             <Link
               href="/converter"
               id="hero-cta"
-              className="group inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_24px_oklch(0.65_0.18_55/0.35)] transition-all duration-300 hover:shadow-[0_0_36px_oklch(0.65_0.18_55/0.55)] hover:brightness-110 active:scale-[0.98]"
+              className="group inline-flex items-center gap-2.5 rounded-xl bg-amber-600 px-7 py-3.5 text-sm font-semibold text-white transition-colors duration-300 hover:bg-amber-500 active:scale-[0.98]"
             >
               Dùng thử ngay
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

@@ -67,7 +67,7 @@ export default function Header() {
           <Button
             href="/converter"
             id="header-cta"
-            className="hidden md:inline-flex shadow-[0_0_20px_oklch(0.65_0.18_55/0.35)] hover:shadow-[0_0_28px_oklch(0.65_0.18_55/0.6)] hover:brightness-110"
+            className="hidden md:inline-flex transition-colors hover:bg-amber-500"
           >
             Dùng thử ngay
           </Button>

@@ -5,6 +5,7 @@ import { useRef, useState, useMemo } from "react";
 import { transposeText, parseTokens } from "@/lib/transpose";
 import { CHROMATIC_SCALE, KEY_DISPLAY_NAMES } from "@/constants/musical-keys";
 import { ChevronDown, ArrowRightLeft } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import type { Token } from "@/lib/transpose";
 
 const DEMO_INPUT = `Am  F  C  G
@@ -41,16 +42,18 @@ function MiniKeySelect({
   onChange: (v: string) => void;
   label: string;
 }) {
+  const displayValue = KEY_DISPLAY_NAMES[CHROMATIC_SCALE.indexOf(value)];
+
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-[10px] font-medium uppercase tracking-wider text-white/25">
+      <span className="text-[10px] font-medium uppercase tracking-wider text-white/25 shrink-0">
         {label}
       </span>
-      <div className="relative">
+      <div className="relative overflow-hidden rounded-md">
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="appearance-none cursor-pointer rounded-md bg-white/[0.06] pl-2 pr-6 py-0.5 text-[11px] font-semibold text-white/60 border border-white/[0.08] hover:bg-white/[0.1] focus:outline-none transition-colors"
+          className="appearance-none cursor-pointer relative z-10 w-[52px] bg-white/[0.06] pl-2 pr-6 py-0.5 text-[11px] font-semibold text-transparent border border-white/[0.08] hover:bg-white/[0.1] focus:outline-none transition-colors"
         >
           {CHROMATIC_SCALE.map((key, i) => (
             <option
@@ -62,7 +65,24 @@ function MiniKeySelect({
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-white/30" />
+
+        {/* Animated Label */}
+        <div className="pointer-events-none absolute inset-y-0 left-2 flex items-center justify-start z-0">
+          <AnimatePresence mode="popLayout">
+            <motion.span
+              key={value}
+              initial={{ y: -15, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 15, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="text-[11px] font-semibold text-white/60 block"
+            >
+              {displayValue}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
+        <ChevronDown className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 w-3 h-3 text-white/30 z-0" />
       </div>
     </div>
   );

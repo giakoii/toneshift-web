@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono } from "next/font/google";
-import "@fontsource/mona-sans";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-ibm-plex-mono",
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700"],
+const plusJakartaSans = Plus_Jakarta_Sans({
+  variable: "--font-plus-jakarta",
+  subsets: ["latin"],
+  weight: ["300", "500", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "ToneShift – Thay đổi cảm âm của bạn",
-  description:
-    "ToneShift là công cụ trực tuyến giúp bạn thay đổi cảm âm bài hát yêu thích. " +
-    "Dễ dàng điều chỉnh cao độ để phù hợp với tone nhạc bạn đang chơi.",
+  title: "HUSH · Sleep, without the scrolling",
+  description: "Hush turns your phone into the one thing in the bedroom that helps you sleep.",
 };
 
 export default function RootLayout({
@@ -26,14 +21,13 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="vi"
-      className={`${ibmPlexMono.variable} h-full antialiased`}
+      lang="en"
+      className={`${plusJakartaSans.variable} h-full antialiased dark`}
     >
-      <body className="bg-background text-foreground overflow-x-hidden">
-        <Header />
-        <main className="pt-20 min-h-[calc(100dvh-72px)]">{children}</main>
-        <Footer />
+      <body className="bg-background text-foreground overflow-x-hidden font-sans relative selection:bg-primary/30">
+        {children}
       </body>
     </html>
   );
 }
+

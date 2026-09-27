@@ -26,10 +26,10 @@ const Button = ({
     const baseClasses = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none";
 
     const variantClasses = {
-        primary: "bg-blue-600 text-white hover:bg-blue-700 shadow-md",
-        secondary: "bg-white/10 text-white hover:bg-white/20",
-        outline: "border border-white/20 text-white hover:bg-white/10",
-        ghost: "text-white/70 hover:text-white hover:bg-white/10"
+        primary: "bg-primary text-primary-foreground hover:brightness-110 shadow-md",
+        secondary: "bg-card border border-border text-foreground hover:bg-card/80",
+        outline: "border border-border text-foreground hover:bg-card",
+        ghost: "text-muted-foreground hover:text-foreground hover:bg-card"
     };
 
     const sizeClasses = {

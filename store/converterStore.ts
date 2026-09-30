@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { transposeText } from "@/lib/transpose";
 
+export const MAX_INPUT_LENGTH = 50_000;
+
 interface ConverterStore {
   inputText: string;
   outputText: string;
@@ -14,7 +16,7 @@ interface ConverterStore {
 
 // Recompute output whenever input or keys change
 function computeOutput(input: string, from: string, to: string): string {
-  if (!input.trim()) return "";
+  if (!input.trim() || input.length > MAX_INPUT_LENGTH) return "";
   return transposeText(input, from, to);
 }
 

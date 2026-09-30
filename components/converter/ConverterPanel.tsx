@@ -1,10 +1,12 @@
 "use client";
 
-import { useConverterStore } from "@/store/converterStore";
+import { useMemo } from "react";
+import { useConverterStore, MAX_INPUT_LENGTH } from "@/store/converterStore";
+import { parseTokens } from "@/lib/transpose";
 import KeySelector from "@/components/converter/KeySelector";
 import SyntaxHighlighter from "@/components/converter/SyntaxHighlighter";
 import ActionBar from "@/components/converter/ActionBar";
-import { ArrowRightLeft } from "lucide-react";
+import { ArrowRightLeft, AlertCircle, Info } from "lucide-react";
 
 export default function ConverterPanel() {
   const inputText = useConverterStore((s) => s.inputText);
@@ -14,6 +16,13 @@ export default function ConverterPanel() {
   const toKey = useConverterStore((s) => s.toKey);
   const setFromKey = useConverterStore((s) => s.setFromKey);
   const setToKey = useConverterStore((s) => s.setToKey);
+
+  const overLimit = inputText.length > MAX_INPUT_LENGTH;
+  const hasChords = useMemo(
+    () => !inputText.trim() || overLimit || parseTokens(inputText).some((t) => t.type === "note"),
+    [inputText, overLimit],
+  );
+  const sameKey = fromKey === toKey;
 
   const handleSwapKeys = () => {
     const oldFrom = fromKey;
@@ -56,6 +65,29 @@ export default function ConverterPanel() {
         <KeySelector variant="to" />
       </div>
 
+      {/* Status messages */}
+      <div className="mb-6 space-y-2 empty:hidden" aria-live="polite">
+        {overLimit && (
+          <p role="alert" className="flex items-center gap-2 text-sm text-red-400">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            Nội dung dài {inputText.length.toLocaleString("vi-VN")} ký tự, vượt giới hạn{" "}
+            {MAX_INPUT_LENGTH.toLocaleString("vi-VN")} ký tự. Hãy rút ngắn để chuyển tone.
+          </p>
+        )}
+        {!overLimit && !hasChords && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Info className="w-4 h-4 shrink-0" />
+            Không phát hiện hợp âm nào trong nội dung. Kiểm tra lại cách viết hợp âm (ví dụ Am, F#m, Sol).
+          </p>
+        )}
+        {!overLimit && inputText.trim() && sameKey && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Info className="w-4 h-4 shrink-0" />
+            Tone gốc và tone đích giống nhau nên kết quả không thay đổi.
+          </p>
+        )}
+      </div>
+
       {/* Panels grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Input panel */}
@@ -73,13 +105,17 @@ export default function ConverterPanel() {
               Nhập cảm âm
             </span>
             {inputText && (
-              <span className="text-[10px] text-muted-foreground/60 tabular-nums uppercase font-bold">
-                {inputText.length} ký tự
+              <span className={`text-[10px] tabular-nums uppercase font-bold ${overLimit ? "text-red-400" : "text-muted-foreground/60"}`}>
+                {inputText.length.toLocaleString("vi-VN")} / {MAX_INPUT_LENGTH.toLocaleString("vi-VN")} ký tự
               </span>
             )}
           </div>
+          <label htmlFor="converter-input" className="sr-only">
+            Nhập cảm âm cần chuyển tone
+          </label>
           <textarea
             id="converter-input"
+            aria-invalid={overLimit}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder={"Ví dụ:\nAm  F  C  G\nDm  Am  Bb  F"}

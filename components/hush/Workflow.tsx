@@ -16,7 +16,7 @@ export function Workflow() {
     { step: "01", title: "Copy lời bài hát", desc: "Tìm và copy bài hát yêu thích của bạn từ bất kỳ trang hợp âm hay website âm nhạc nào." },
     { step: "02", title: "Dán vào ToneShift", desc: "Trình phân tích của ToneShift tự động tách biệt giữa lời bài hát tiếng Việt và các ký hiệu hợp âm." },
     { step: "03", title: "Chọn tone phù hợp", desc: "Giọng bạn hợp với tone G hơn tone C? Chỉ cần một click, toàn bộ hợp âm sẽ được tính toán lại." },
-    { step: "04", title: "Chơi nhạc", desc: "Giao diện gọn gàng với tính năng tự động cuộn (Auto-scroll) giúp bạn vừa đàn vừa hát dễ dàng." },
+    { step: "04", title: "Chơi nhạc", desc: "Bật chế độ biểu diễn với tự động cuộn và giữ màn hình sáng, giúp bạn vừa đàn vừa hát dễ dàng." },
   ];
 
   return (

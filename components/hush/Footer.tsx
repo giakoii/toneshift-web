@@ -1,4 +1,4 @@
-"use client";
+import Link from "next/link";
 import { Music } from "lucide-react";
 
 export function Footer() {
@@ -19,30 +19,21 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-foreground mb-4">Sản phẩm</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><a href="/#features" className="hover:text-foreground transition-colors">Tính năng</a></li>
-              <li><a href="/#converter" className="hover:text-foreground transition-colors">Công cụ chuyển đổi</a></li>
+              <li><Link href="/#features" className="hover:text-foreground transition-colors">Tính năng</Link></li>
+              <li><Link href="/converter" className="hover:text-foreground transition-colors">Công cụ chuyển đổi</Link></li>
             </ul>
           </div>
-          
+
           <div>
             <h4 className="font-bold text-foreground mb-4">Hỗ trợ</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><a href="/#workflow" className="hover:text-foreground transition-colors">Hướng dẫn</a></li>
-              <li><a href="/#contact" className="hover:text-foreground transition-colors">Liên hệ</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-bold text-foreground mb-4">Pháp lý</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-colors">Bảo mật</a></li>
-              <li><a href="#" className="hover:text-foreground transition-colors">Điều khoản</a></li>
+              <li><Link href="/#workflow" className="hover:text-foreground transition-colors">Hướng dẫn</Link></li>
             </ul>
           </div>
         </div>
         
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-border text-sm text-muted-foreground/60">
-          <p>© 2026 ToneShift. All rights reserved.</p>
+          <p>© 2026 ToneShift. Bảo lưu mọi quyền.</p>
           <p>Mã nguồn mở, xây dựng cho cộng đồng âm nhạc.</p>
         </div>
       </div>

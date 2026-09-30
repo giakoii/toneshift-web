@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { ScrollReveal } from "./ScrollReveal";
 import { AuroraBackground } from "./AuroraBackground";
 
@@ -16,9 +17,9 @@ export function FinalCTA() {
           </h2>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-            <a href="/converter" className="w-full sm:w-auto flex items-center justify-center h-14 px-10 rounded-full bg-primary text-primary-foreground font-semibold hover:brightness-110 transition-all">
+            <Link href="/converter" className="w-full sm:w-auto flex items-center justify-center h-14 px-10 rounded-full bg-primary text-primary-foreground font-semibold hover:brightness-110 transition-all">
               Thử nghiệm miễn phí
-            </a>
+            </Link>
           </div>
           
           <p className="text-muted-foreground font-light">

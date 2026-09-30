@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import Toaster from "@/components/ui/Toaster";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  weight: ["300", "500", "700"],
+  subsets: ["latin", "vietnamese"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "HUSH · Sleep, without the scrolling",
-  description: "Hush turns your phone into the one thing in the bedroom that helps you sleep.",
+  title: "ToneShift · Chuyển tone bài hát nhanh và chuẩn xác",
+  description: "Dán cảm âm, chọn tone, nhận kết quả ngay. Hỗ trợ đủ 12 tone và ký hiệu Đô Rê Mi.",
 };
 
 export default function RootLayout({
@@ -21,11 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="vi"
       className={`${plusJakartaSans.variable} h-full antialiased dark`}
     >
       <body className="bg-background text-foreground overflow-x-hidden font-sans relative selection:bg-primary/30">
         {children}
+        <Toaster />
       </body>
     </html>
   );

@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { AuroraBackground } from "./AuroraBackground";
@@ -74,12 +75,12 @@ export function HeroSection() {
             transition={{ duration: 0.9, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
           >
-            <a href="/converter" className="w-full sm:w-auto flex items-center justify-center h-14 px-8 rounded-full bg-primary text-primary-foreground font-semibold hover:brightness-110 transition-all">
+            <Link href="/converter" className="w-full sm:w-auto flex items-center justify-center h-14 px-8 rounded-full bg-primary text-primary-foreground font-semibold hover:brightness-110 transition-all">
               Chuyển Tone Ngay
-            </a>
-            <a href="#features" className="w-full sm:w-auto flex items-center justify-center h-14 px-8 rounded-full bg-card border border-border text-foreground font-semibold hover:bg-card/80 transition-colors">
+            </Link>
+            <Link href="/#features" className="w-full sm:w-auto flex items-center justify-center h-14 px-8 rounded-full bg-card border border-border text-foreground font-semibold hover:bg-card/80 transition-colors">
               Tìm hiểu thêm
-            </a>
+            </Link>
           </motion.div>
         </div>
 

@@ -1,6 +1,5 @@
 # Maven
 target/
-!.mvn/wrapper/maven-wrapper.jar
 
 # IDE
 .idea/
@@ -10,6 +9,24 @@ target/
 # Logs
 *.log
 
-# Local config
+# Local config & environment
 application-local.yml
+application-local.yaml
+application-prod.yml
+application-prod.yaml
+application-secret*.yml
 .env*
+!.env.example
+docker-compose.override.yml
+
+# Secrets, keys, certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.crt
+secrets/
+credentials*.json
+service-account*.json

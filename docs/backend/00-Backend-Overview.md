@@ -14,6 +14,7 @@
 | [`03-Class-Design.md`](./03-Class-Design.md) | Package structure, DTO, Repository, Service, Controller, Exception skeleton |
 | [`04-Implementation-Checklist.md`](./04-Implementation-Checklist.md) | Checklist tuần tự Step 1 → Step 5 |
 | [`05-Testing-Plan.md`](./05-Testing-Plan.md) | Unit / Integration test và edge case |
+| [`06-Event-Design.md`](./06-Event-Design.md) | Domain event trong-process (Spring `ApplicationEventPublisher`): catalog event, transaction phase, quy ước publish/listen |
 
 ---
 

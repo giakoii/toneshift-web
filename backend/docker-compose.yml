@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: toneshift-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-toneshift}
+      POSTGRES_USER: ${DB_USERNAME:-toneshift}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - toneshift-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-toneshift}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  toneshift-postgres-data:

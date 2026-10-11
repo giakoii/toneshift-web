@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/toneshift_test
+    username: test
+    password: ${TEST_DB_PASSWORD:}
+  jpa:
+    show-sql: false
+
+app:
+  public-web-url: http://localhost:3000
+  cors:
+    allowed-origins: http://localhost:3000

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -84,6 +86,34 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException ex, HttpServletRequest request) {
         return respond(ErrorResponse.of(ex.code(), ex.getMessage(), request.getRequestURI(), traceId()));
+    }
+
+    /**
+     * Handles authorization failures thrown inside the dispatcher, such as a denied
+     * {@code @PreAuthorize} check (HTTP 403).
+     *
+     * <p>Required because the catch-all handler below runs first and would otherwise turn a
+     * denial into a 500 instead of letting it reach the security chain's access denied handler.
+     *
+     * @param ex      the access denied exception
+     * @param request the current HTTP request
+     * @return the FORBIDDEN error response
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        return respond(ErrorResponse.of(ErrorCode.FORBIDDEN, ErrorCode.FORBIDDEN.defaultMessage(), request.getRequestURI(), traceId()));
+    }
+
+    /**
+     * Handles authentication failures thrown inside the dispatcher (HTTP 401).
+     *
+     * @param ex      the authentication exception
+     * @param request the current HTTP request
+     * @return the UNAUTHORIZED error response
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
+        return respond(ErrorResponse.of(ErrorCode.UNAUTHORIZED, ErrorCode.UNAUTHORIZED.defaultMessage(), request.getRequestURI(), traceId()));
     }
 
     /**

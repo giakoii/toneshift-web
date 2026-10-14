@@ -5,16 +5,33 @@ Thứ tự module đề xuất (theo `MVP_ROADMAP`): **Foundation → Auth/User 
 
 ---
 
-## Step 0 – Foundation (làm trước)
+## Step 0 – Foundation (làm trước) ✅ Done
 
-- [ ] `pom.xml`, `ToneShiftApplication`, `application.yml` (+ `application-dev.yml`, `application-test.yml`)
-- [ ] `docker-compose.yml` PostgreSQL 16 cho dev
-- [ ] `common/exception/*` (`ErrorCode`, `ApiException`, `GlobalExceptionHandler`) + `ErrorResponse`
-- [ ] `common/dto/*` (`PageResponse`, `CursorResponse`, `UserRef`), `CursorCodec`
-- [ ] `config/*`: `JpaAuditingConfig`, `JacksonConfig` (ISO date, null giữ), `OpenApiConfig`, `CorsConfig`
-- [ ] `TraceIdFilter` (MDC `traceId`, trả header `X-Trace-Id`)
-- [ ] Testcontainers base class `AbstractIntegrationTest`
+- [x] `pom.xml`, `ToneShiftApplication`, `application.yml` (+ `application-dev.yml`, `application-test.yml`)
+- [x] `docker-compose.yml` PostgreSQL 16 cho dev
+- [x] `common/exception/*` (`ErrorCode`, `ApiException`, `GlobalExceptionHandler`) + `ErrorResponse`
+- [x] `common/dto/*` (`PageResponse`, `CursorResponse`, `UserRef`), `CursorCodec`
+- [x] `config/*`: `JpaAuditingConfig`, `JacksonConfig` (ISO date, null giữ), `OpenApiConfig`, `CorsConfig`
+- [x] `TraceIdFilter` (MDC `traceId`, trả header `X-Trace-Id`)
+- [x] Testcontainers base class `AbstractIntegrationTest`
+- [x] Logging 3 file (`AppLog`, `logback-spring.xml`) — bổ sung ngoài kế hoạch ban đầu, xem D17 ở `00-Backend-Overview.md`
 - **Edge case**: `open-in-view=false`; `ddl-auto=validate`; timezone JVM = UTC (`-Duser.timezone=UTC`)
+
+## Step 1–5 (Auth/User) ✅ Done
+
+Toàn bộ module Auth/User đã triển khai theo thứ tự slice thực tế (khác chút so với Step 1→5 lý thuyết bên dưới, nhưng phủ đủ các mục):
+
+1. Migration `V1__extensions_and_users.sql` + entity/repository (`User`, `AuthProvider`, `RefreshToken`, `PasswordResetToken`)
+2. JWT HS256 (`JwtConfig`, `JwtService`) + `SecurityConfig` + `OptionalBearerTokenResolver` + `@CurrentUser`; `register`/`login`/`logout`, `GET /api/user/me`
+3. OIDC đa provider (`POST /api/auth/oauth/{provider}`, Google trước — xem D16)
+4. Refresh rotation (`FOR UPDATE` + grace 10s) + hạ tầng event async
+5. `PUT /api/user/profile`, `POST /api/user/change-password` (revoke toàn bộ session)
+6. Forgot/reset password + mail
+7. `RateLimitFilter` (bucket4j) + `TokenCleanupJob`
+
+Chưa làm: admin block/unblock, `UserBlockedEvent`, `UserRegisteredEvent`/welcome mail (chờ có email template thật — xem rule D20 ở `06-Event-Design.md`, không publish event chưa có listener).
+
+Mục bên dưới giữ nguyên làm tài liệu tham khảo cho các module sau (Song/Share/Community/Setlist/Admin).
 
 ## Step 1 – Database Migration / Entities / Repository
 

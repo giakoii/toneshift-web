@@ -4,7 +4,7 @@
 
 ## 1. Maven & cấu hình
 
-`pom.xml` dependencies chính: `spring-boot-starter-web`, `-validation`, `-data-jpa`, `-security`, `-oauth2-resource-server`, `-actuator`, `-mail`, `postgresql`, `flyway-core` + `flyway-database-postgresql`, `mapstruct` (+ processor), `lombok` (+ `lombok-mapstruct-binding`), `springdoc-openapi-starter-webmvc-ui`, `bucket4j`, `shedlock`; test: `spring-boot-starter-test`, `spring-security-test`, `testcontainers` (`postgresql`, `junit-jupiter`).
+`pom.xml` dependencies chính: `spring-boot-starter-web`, `-validation`, `-data-jpa`, `-security`, `-oauth2-resource-server`, `-actuator`, `-mail`, `postgresql`, `flyway-core` + `flyway-database-postgresql`, `mapstruct` (+ processor), `lombok` (+ `lombok-mapstruct-binding`), `springdoc-openapi-starter-webmvc-ui`, `bucket4j_jdk17-core`, `com.nimbusds:oauth2-oidc-sdk` (ghim `11.9.1`, không dùng `11.23+` vì kéo `nimbus-jose-jwt` khác bản với Spring Security); test: `spring-boot-starter-test`, `spring-security-test`, `testcontainers` (`postgresql`, `junit-jupiter`). ShedLock chưa thêm — chỉ cần khi chạy nhiều instance.
 
 `application.yml` khoá chính:
 
@@ -15,9 +15,15 @@ spring:
 app:
   public-web-url: ${PUBLIC_WEB_URL}
   cors.allowed-origins: ${CORS_ORIGINS}
-  jwt: { issuer: toneshift, access-ttl: 15m, refresh-ttl: 30d, secret-or-key: ${JWT_KEY} }
-  google.client-id: ${GOOGLE_CLIENT_ID}
+  jwt: { issuer: toneshift, access-ttl: 15m, refresh-ttl: 30d, secret-or-key: ${JWT_KEY}, refresh-reuse-grace: 10s }
+  oidc:
+    providers:
+      google: { issuer: https://accounts.google.com, client-id: ${GOOGLE_CLIENT_ID}, jwks-uri: https://www.googleapis.com/oauth2/v3/certs }
+  mail.from: ${MAIL_FROM}
+  rate-limit: { login-per-minute: 10, register-per-minute: 5, forgot-password-per-minute: 5 }
 ```
+
+Đa provider: mỗi provider là 1 block dưới `app.oidc.providers` (key = slug, viết thường, khớp hằng số `AuthProviderType`) + 1 hằng số enum tương ứng — không cần migration vì `auth_providers.provider` đã là `varchar(20)` generic.
 
 `open-in-view: false` bắt buộc: chống lazy-load ngầm trong controller/serializer.
 
@@ -86,7 +92,7 @@ Endpoint 🔓: permitAll trong chain, nhưng bearer token hợp lệ vẫn đư�
 record RegisterRequest(@NotBlank @Size(max=100) String name, @NotBlank @Email @Size(max=254) String email,
                        @NotBlank @Size(min=8,max=72) @Pattern(regexp="^(?=.*[A-Za-z])(?=.*\\d).+$") String password) {}
 record LoginRequest(@NotBlank @Email String email, @NotBlank String password) {}
-record GoogleLoginRequest(@NotBlank String idToken) {}
+record OAuthLoginRequest(@NotBlank String idToken) {}   // dùng chung cho mọi provider, không chỉ Google
 record RefreshRequest(@NotBlank String refreshToken) {}
 record ForgotPasswordRequest(@NotBlank @Email String email) {}
 record ResetPasswordRequest(@NotBlank String token, @NotBlank @Size(min=8,max=72) String newPassword) {}
@@ -104,15 +110,30 @@ interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken,
 class AuthService {                                   // @Transactional trên từng method ghi
   AuthResponse register(RegisterRequest r);           // @Transactional
   AuthResponse login(LoginRequest r);                 // @Transactional (ghi refresh token)
-  AuthResponse loginWithGoogle(GoogleLoginRequest r); // @Transactional
+  AuthResponse loginWithOidc(String providerSlug, OAuthLoginRequest r); // @Transactional
   AuthResponse refresh(RefreshRequest r);             // @Transactional(rollbackFor = Exception.class); dùng SELECT ... FOR UPDATE trên token
   void logout(RefreshRequest r);                      // @Transactional
   void forgotPassword(ForgotPasswordRequest r);       // @Transactional; gửi mail sau commit (@TransactionalEventListener AFTER_COMMIT)
   void resetPassword(ResetPasswordRequest r);         // @Transactional
 }
-interface TokenService { IssuedRefreshToken issue(User u, UUID familyId, String ua); Rotated rotate(String raw); void revokeAll(UUID userId); }
-interface GoogleIdTokenVerifier { GoogleIdentity verify(String idToken); }     // wrap Nimbus, mock được trong test
-@RestController @RequestMapping("/api/auth") class AuthController { /* 8 endpoint mục 1 contract */ }
+
+// Nội bộ module, không nằm trong docs gốc nhưng cần định nghĩa khi code:
+record IssuedRefreshToken(UUID id, String rawToken, UUID familyId, Instant expiresAt) {}
+record Rotated(User user, IssuedRefreshToken issued) {}   // TokenService -> AuthService, cùng module nên mang entity được
+
+interface TokenService {
+  IssuedRefreshToken issue(User u, UUID familyId, String ua);
+  Rotated rotate(String rawToken, String userAgent);   // FOR UPDATE trên token, 10s grace trước khi revoke cả family
+  int revokeFamily(UUID familyId);
+  int revokeAll(UUID userId);
+}
+
+// auth/oidc/ — thay cho GoogleIdTokenVerifier/GoogleIdentity cố định, generalize đa provider
+record OidcIdentity(AuthProviderType provider, String subject, String email, boolean emailVerified, String name, String pictureUrl) {}
+interface OidcTokenVerifier { OidcIdentity verify(AuthProviderType provider, String idToken); }   // impl bằng oauth2-oidc-sdk, mock được trong test
+class OidcProviderRegistry { AuthProviderType require(String slug); /* 400 nếu slug lạ */ IDTokenValidator validatorFor(AuthProviderType p); }
+
+@RestController @RequestMapping("/api/auth") class AuthController { /* 8 endpoint mục 1 contract, oauth dùng /oauth/{provider} */ }
 ```
 
 ## 6. Module `user`

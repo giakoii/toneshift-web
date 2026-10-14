@@ -60,11 +60,13 @@ Request: `{ "email": "...", "password": "..." }` (`@NotBlank @Email`, `@NotBlank
 Response **200**: `AuthResponse`. Lỗi: 400, 401 `INVALID_CREDENTIALS` (cùng message cho email sai/mật khẩu sai, chống dò email), 403 `ACCOUNT_BLOCKED`, 429.
 Tài khoản chỉ có Google (không có `password_hash`) đăng nhập bằng mật khẩu → 401 `INVALID_CREDENTIALS`.
 
-### 1.3 `POST /api/auth/oauth/google` 🌐
+### 1.3 `POST /api/auth/oauth/{provider}` 🌐
 
-Request: `{ "idToken": "<Google ID token>" }` (`@NotBlank`).
-BE verify chữ ký, `aud` = Google client id, `exp`, `email_verified=true`. Email đã có → link thêm provider (không tạo user mới); chưa có → tạo user (`password_hash = NULL`, `email_verified_at = now`).
-Response **200**: `AuthResponse`. Lỗi: 401 `INVALID_CREDENTIALS` (token sai/email chưa verified), 403 `ACCOUNT_BLOCKED`.
+`{provider}` là slug đã cấu hình trong `app.oidc.providers` (MVP: `google`). Slug không được hỗ trợ → 400 `MALFORMED_REQUEST` (không 404/500).
+
+Request: `{ "idToken": "<ID token của provider>" }` (`@NotBlank`). Ví dụ `provider=google`:
+BE verify chữ ký, `iss`, `aud` = client id đã cấu hình cho provider đó, `exp`, `email_verified=true`. Email đã có → link thêm provider (không tạo user mới); chưa có → tạo user (`password_hash = NULL`, `email_verified_at = now`).
+Response **200**: `AuthResponse`. Lỗi: 400 `MALFORMED_REQUEST` (provider không hỗ trợ), 401 `INVALID_CREDENTIALS` (token sai/email chưa verified), 403 `ACCOUNT_BLOCKED`.
 
 ### 1.4 `POST /api/auth/refresh` 🌐
 
@@ -82,11 +84,13 @@ Request: `{ "refreshToken": "..." }`. Response **204** (idempotent, token lạ v
   "tokenType": "Bearer",
   "expiresIn": 900,
   "refreshToken": "b1c9...",
-  "user": { "id": "uuid", "name": "Khoi PG", "email": "khoi@example.com", "image": null, "role": "USER" }
+  "user": { "id": "uuid", "name": "Khoi PG", "email": "khoi@example.com", "image": null, "role": "USER", "hasPassword": true, "providers": ["GOOGLE"], "createdAt": "2026-05-30T10:15:30Z" }
 }
 ```
 
-Claims access JWT: `sub` (userId), `role`, `iat`, `exp`. Không chứa email/thông tin nhạy cảm.
+`user` là `UserResponse` đầy đủ (mục 2.1), không phải bản rút gọn.
+
+Claims access JWT: `iss` (`toneshift`), `sub` (userId), `role`, `iat`, `exp`. Không chứa email/thông tin nhạy cảm.
 
 ### 1.7 `POST /api/auth/forgot-password` 🌐
 
@@ -113,7 +117,7 @@ Response **200** `UserResponse`.
 
 ### 2.3 `POST /api/user/change-password` 🔒
 
-Request: `{ "currentPassword": "…", "newPassword": "…" }`. Response **204**, revoke refresh token khác của user. Lỗi: 400, 401 `INVALID_CREDENTIALS` (sai mật khẩu hiện tại; tài khoản Google-only chưa có password → được phép đặt mà không cần `currentPassword`: gửi `currentPassword: null`).
+Request: `{ "currentPassword": "…", "newPassword": "…" }`. Response **204**, **revoke toàn bộ refresh token của user (đăng xuất mọi thiết bị, kể cả phiên đang gọi request này)** — BE không có cách phân biệt phiên nào đang gọi, nên dùng chung quy tắc với reset-password thay vì chỉ revoke "các token khác". Lỗi: 400, 401 `INVALID_CREDENTIALS` (sai mật khẩu hiện tại; tài khoản Google-only chưa có password → được phép đặt mà không cần `currentPassword`: gửi `currentPassword: null`).
 
 ---
 

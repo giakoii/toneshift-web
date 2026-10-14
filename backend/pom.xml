@@ -20,7 +20,17 @@
 
   <properties>
     <java.version>21</java.version>
-    <testcontainers.version>1.20.1</testcontainers.version>
+    <testcontainers.version>1.21.4</testcontainers.version>
+    <!-- Docker Engine 29 refuses API versions below 1.44; the docker-java pulled in by
+         Testcontainers 1.21.4 still asks for an older one, so pin a newer client. -->
+    <docker-java.version>3.6.0</docker-java.version>
+    <!-- Overrides the Boot-managed 1.18.34, which cannot parse JDK 26 (ExceptionInInitializerError in javac). -->
+    <lombok.version>1.18.46</lombok.version>
+    <!-- Not managed by the Spring Boot BOM, unlike Lombok. -->
+    <mapstruct.version>1.6.2</mapstruct.version>
+    <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+    <oauth2-oidc-sdk.version>11.9.1</oauth2-oidc-sdk.version>
+    <bucket4j.version>8.21.0</bucket4j.version>
   </properties>
 
   <dependencyManagement>
@@ -31,6 +41,16 @@
         <version>${testcontainers.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java-api</artifactId>
+        <version>${docker-java.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.docker-java</groupId>
+        <artifactId>docker-java-transport-zerodep</artifactId>
+        <version>${docker-java.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -66,10 +86,54 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Security -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
+    <!-- IDTokenValidator: spec-complete verification of third-party OIDC ID tokens.
+         Pinned to 11.9.x because 11.23+ wants nimbus-jose-jwt 10, while Spring Security 6.3
+         brings 9.37.x; mixing the two would leave two JOSE implementations on the classpath. -->
+    <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>oauth2-oidc-sdk</artifactId>
+      <version>${oauth2-oidc-sdk.version}</version>
+    </dependency>
+
+    <!-- Rate limiting. The jdk17 artifact is the maintained line; bucket4j-core stopped at 8.10. -->
+    <dependency>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j_jdk17-core</artifactId>
+      <version>${bucket4j.version}</version>
+    </dependency>
+
+    <!-- Mail: password reset -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-mail</artifactId>
+    </dependency>
+
     <!-- Observability -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Code generation -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${mapstruct.version}</version>
     </dependency>
 
     <!-- API docs -->
@@ -83,6 +147,11 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -102,6 +171,35 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- Declaring annotationProcessorPaths disables classpath scanning: every processor must be listed here. -->
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok-mapstruct-binding</artifactId>
+              <version>${lombok-mapstruct-binding.version}</version>
+            </path>
+          </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Amapstruct.unmappedTargetPolicy=ERROR</arg>
+            <arg>-Amapstruct.defaultComponentModel=spring</arg>
+            <arg>-parameters</arg>
+          </compilerArgs>
+        </configuration>
       </plugin>
     </plugins>
   </build>

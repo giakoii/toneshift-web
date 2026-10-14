@@ -3,14 +3,29 @@ spring:
     url: jdbc:postgresql://localhost:5432/${DB_NAME:toneshift}
     username: ${DB_USERNAME:toneshift}
     password: ${DB_PASSWORD}
-  jpa:
-    show-sql: true
+  mail:
+    # Defaults aim at a local catcher such as MailHog, so dev needs no real SMTP account.
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:dev}
+    password: ${MAIL_PASSWORD:dev}
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
 
 app:
   public-web-url: ${PUBLIC_WEB_URL:http://localhost:3000}
   cors:
     allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+  mail:
+    from: ${MAIL_FROM:no-reply@toneshift.local}
+  oidc:
+    providers:
+      google:
+        # Placeholder so the app boots without a real Google app; a real token will fail the aud check.
+        client-id: ${GOOGLE_CLIENT_ID:dev-google-client-id}
 
 logging:
   level:
     vn.toneshift: DEBUG
+    org.springframework.security: DEBUG

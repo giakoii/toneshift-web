@@ -5,8 +5,36 @@ spring:
     password: ${TEST_DB_PASSWORD:}
   jpa:
     show-sql: false
+  mail:
+    # Never reached: tests mock the mail sender.
+    host: localhost
+    port: 2525
+    username: test
+    password: test
 
 app:
   public-web-url: http://localhost:3000
   cors:
     allowed-origins: http://localhost:3000
+  mail:
+    from: no-reply@toneshift.test
+  rate-limit:
+    # Effectively off: every test calls these endpoints from the same address, so production
+    # limits would throttle unrelated tests. RateLimitIntegrationTest sets its own low values.
+    login-per-minute: 100000
+    register-per-minute: 100000
+    forgot-password-per-minute: 100000
+  jwt:
+    issuer: toneshift
+    access-ttl: 15m
+    refresh-ttl: 30d
+    # Test-only key, never used outside the test profile.
+    secret-or-key: dGVzdC1vbmx5LXNlY3JldC1rZXktZm9yLXRvbmVzaGlmdC0xMjM0
+    refresh-reuse-grace: 10s
+  oidc:
+    providers:
+      google:
+        issuer: https://accounts.google.com
+        client-id: test-google-client-id
+        # Never fetched: tests either mock the verifier or inject their own key source.
+        jwks-uri: http://localhost:1/jwks

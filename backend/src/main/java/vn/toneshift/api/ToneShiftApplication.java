@@ -2,6 +2,7 @@ package vn.toneshift.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 import java.util.TimeZone;
 
@@ -9,6 +10,7 @@ import java.util.TimeZone;
  * Entry point of the ToneShift backend application.
  */
 @SpringBootApplication
+@ConfigurationPropertiesScan
 public class ToneShiftApplication {
 
     /**

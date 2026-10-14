@@ -6,13 +6,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Configures CORS for the {@code /api/**} endpoints using the allowed origins from application properties.
+ *
+ * <p>Exposes only the configuration source: the security chain's {@code cors()} step installs the
+ * filter. Registering a {@code CorsFilter} bean here as well would put a second filter in the
+ * servlet chain and emit duplicate {@code Access-Control-Allow-Origin} headers, which browsers reject.
  */
 @Configuration
 public class CorsConfig {
@@ -36,16 +39,5 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         return source;
-    }
-
-    /**
-     * Registers the servlet filter that applies the CORS configuration to incoming requests.
-     *
-     * @param corsConfigurationSource the CORS configuration source to apply
-     * @return the CORS filter
-     */
-    @Bean
-    public CorsFilter corsFilter(CorsConfigurationSource corsConfigurationSource) {
-        return new CorsFilter(corsConfigurationSource);
     }
 }

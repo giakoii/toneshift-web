@@ -15,6 +15,14 @@ spring:
           batch_size: 50
   flyway:
     enabled: true
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
 server:
   port: ${SERVER_PORT:8080}
@@ -27,8 +35,34 @@ management:
   endpoint:
     health:
       show-details: never
+  health:
+    # Mail is only used for password reset links, so an unreachable SMTP server must not make the
+    # whole application look unhealthy and take it out of the load balancer.
+    mail:
+      enabled: false
 
 app:
   public-web-url: ${PUBLIC_WEB_URL}
   cors:
     allowed-origins: ${CORS_ORIGINS}
+  mail:
+    from: ${MAIL_FROM}
+  rate-limit:
+    login-per-minute: 10
+    register-per-minute: 5
+    forgot-password-per-minute: 5
+  jwt:
+    issuer: toneshift
+    access-ttl: 15m
+    refresh-ttl: 30d
+    # Base64 of at least 32 random bytes: openssl rand -base64 32
+    secret-or-key: ${JWT_KEY}
+    # A refresh token replayed within this window returns 401 without killing the token family,
+    # so a client retrying after a network error is not treated as an attacker.
+    refresh-reuse-grace: 10s
+  oidc:
+    providers:
+      google:
+        issuer: https://accounts.google.com
+        client-id: ${GOOGLE_CLIENT_ID}
+        jwks-uri: https://www.googleapis.com/oauth2/v3/certs

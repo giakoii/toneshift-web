@@ -104,6 +104,8 @@ Modules:
 | D13 | Share luôn mới nhất | Share trỏ `song_id`, đọc live từ `songs` | Quyết định trong `designs/Shareable-Link.md` |
 | D14 | Thứ tự setlist | `order_index` + unique **deferrable** `(setlist_id, order_index)`; mọi thao tác ghi khoá dòng `setlists` (`PESSIMISTIC_WRITE`) | Reorder/add đồng thời không tạo trùng vị trí |
 | D15 | Optimistic locking | `songs.version`, `setlists.version` (`@Version`); `PUT` nhận `version` tuỳ chọn → lệch thì 409 | Tránh ghi đè khi sửa 2 tab |
+| D16 | Đa provider OIDC | BE chỉ **verify ID token** của bên thứ ba (`com.nimbusds:oauth2-oidc-sdk`), không làm OAuth redirect client. Endpoint generic `POST /api/auth/oauth/{provider}`; mỗi provider = 1 block `app.oidc.providers.<slug>` + 1 hằng số `AuthProviderType`, không cần migration vì cột `provider` đã generic. MVP ship Google trước | Trả lời Q4: không cần Facebook ngay, nhưng kiến trúc không khoá cứng vào Google |
+| D17 | Logging 3 file | `logback-spring.xml` tách log ra `logs/app.log` (toàn bộ), `logs/sql.log` (câu SQL + tham số, qua `org.hibernate.SQL`), `logs/error.log` (chỉ ERROR). Mọi class log qua facade `common/logging/AppLog`, không `@Slf4j` trực tiếp | Dễ tra cứu SQL/lỗi riêng biệt mà không cần parse 1 file log khổng lồ |
 
 ---
 

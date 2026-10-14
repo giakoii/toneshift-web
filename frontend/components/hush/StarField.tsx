@@ -13,6 +13,7 @@ export function StarField() {
       delay: Math.random() * 5,
       duration: 3 + Math.random() * 2,
     }));
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStars(newStars);
   }, []);
 

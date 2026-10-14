@@ -53,7 +53,7 @@ const Button = ({
 
     if (href) {
         return (
-            <Link href={href} className={combinedClassName} onClick={props.onClick as any}>
+            <Link href={href} className={combinedClassName} onClick={props.onClick as unknown as React.MouseEventHandler<HTMLAnchorElement>}>
                 {content}
             </Link>
         );

@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import vn.toneshift.api.common.dto.ErrorResponse;
 import vn.toneshift.api.common.dto.FieldErrorItem;
@@ -56,6 +57,28 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConstraintViolation(jakarta.validation.ConstraintViolationException ex, HttpServletRequest request) {
         List<FieldErrorItem> errors = ex.getConstraintViolations().stream()
                 .map(v -> new FieldErrorItem(v.getPropertyPath().toString(), v.getMessage()))
+                .toList();
+        return respond(ErrorResponse.ofValidation(ErrorCode.VALIDATION_FAILED.defaultMessage(), request.getRequestURI(), traceId(), errors));
+    }
+
+    /**
+     * Handles parameter constraint failures raised by Spring's own method validation (HTTP 400).
+     *
+     * <p>A controller annotated {@code @Validated} produces {@link jakarta.validation.ConstraintViolationException}
+     * instead, handled above. This handler covers the other case, where Spring MVC validates the
+     * parameters itself; without it the catch-all below would turn a bad query parameter into a 500.
+     *
+     * @param ex      the method validation exception
+     * @param request the current HTTP request
+     * @return the error response with the field errors
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleMethodValidation(HandlerMethodValidationException ex, HttpServletRequest request) {
+        List<FieldErrorItem> errors = ex.getAllValidationResults().stream()
+                .flatMap(result -> result.getResolvableErrors().stream()
+                        .map(error -> new FieldErrorItem(
+                                result.getMethodParameter().getParameterName(),
+                                error.getDefaultMessage())))
                 .toList();
         return respond(ErrorResponse.ofValidation(ErrorCode.VALIDATION_FAILED.defaultMessage(), request.getRequestURI(), traceId(), errors));
     }

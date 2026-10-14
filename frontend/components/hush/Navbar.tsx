@@ -7,7 +7,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { logoutAction } from "@/app/(auth)/actions";
 
 export function Navbar() {
-  const { user } = useAuth();
+  const { user, status } = useAuth();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -38,7 +38,11 @@ export function Navbar() {
           <Link href="/#workflow" className="hover:text-foreground transition-colors">Hướng dẫn</Link>
         </div>
 
-        {user ? (
+        {status === "loading" ? (
+          // Trạng thái chờ /api/session trả lời — giữ đúng chiều cao để không giật layout,
+          // không đoán trước là đã đăng nhập hay chưa.
+          <div className="h-10 w-10" aria-hidden="true" />
+        ) : status === "authenticated" && user ? (
           <div className="flex items-center gap-3">
             <Link
               href="/converter"
